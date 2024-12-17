@@ -1,3 +1,75 @@
+body {
+  background-color: #6cb6d3;
+}
+
+
+.dashboard-container {
+  display: flex;
+  height: 100vh;
+}
+
+.user-info {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.user-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.user-info h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin: 0;
+}
+
+.nav-links {
+  width: 100%;
+}
+
+.nav-links ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-links li {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.nav-links a, .logout-button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  text-align: center;
+  text-decoration: none;
+  color: #333;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.nav-links a:hover, .logout-button:hover {
+  background-color: #ced4da;
+}
+
+.logout-button {
+  border: none;
+  cursor: pointer;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 270px; /* Adjust based on sidebar width */
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
 .title-container {
   text-align: center;
   margin: 20px 0 40px;
@@ -8,15 +80,6 @@
   color: #333;
   font-weight: 600;
   margin: 0;
-}
-
-.dashboard-container {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
 }
 
 .store-button {
@@ -37,7 +100,7 @@
 
 .centered-table-container {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start; /* Align table to the left */
   width: 100%;
 }
 
@@ -51,7 +114,6 @@
   max-width: 800px;
 }
 
-/* Add smooth scrollbar for webkit browsers */
 .table-container::-webkit-scrollbar {
   width: 8px;
 }
@@ -106,9 +168,13 @@ tr:hover {
 
 @media screen and (max-width: 600px) {
   .dashboard-container {
-    padding: 10px;
+    flex-direction: column;
   }
-  
+
+  .main-content {
+    padding-left: 0; /* Remove padding on small screens */
+  }
+
   .table-container {
     width: 95%;
   }

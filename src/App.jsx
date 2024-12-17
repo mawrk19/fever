@@ -1,11 +1,31 @@
 import React from 'react';
-import Dashboard from './Dashboard';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Login from './Login';
+import Dashboard from './Dashboard'; // Import the Dashboard component
+import Register from './Register'; // Import the Register component
+import Home from './Home'; // Import the Home component
+import Profile from './Profile'; // Import the Profile component
+import History from './History'; // Import the History component
+import Sidebar from './Sidebar'; // Import the Sidebar component
 
 function App() {
   return (
-    <div className="App">
-      <Dashboard />  {/* Rendering Dashboard component */}
-    </div>
+    <Router>
+      <div className="App">
+        <Sidebar /> {/* Add Sidebar component */}
+        <div className="main-content">
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/register" element={<Register />} /> {/* Register route */}
+            <Route path="/home" element={<Home />} /> {/* Add Home route */}
+            <Route path="/profile" element={<Profile />} /> {/* Add Profile route */}
+            <Route path="/history" element={<History />} /> {/* Add History route */}
+            <Route path="/" element={<Login />} /> {/* Default route */}
+          </Routes>
+        </div>
+      </div>
+    </Router>
   );
 }
 

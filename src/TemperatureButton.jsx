@@ -29,10 +29,10 @@ function TemperatureButton({ setTemperature, addTemperatureToHistory }) {
         if (latestTemperature?.temperature && latestTemperature?.timestamp) {
           // Ensure the fetched temperature is treated as a float
           let temperature = parseFloat(latestTemperature.temperature);
-          
-          // Add a small decimal variation between 0.1 and 0.8
-          const randomDecimal = (Math.random() * 0.7 + 0.1).toFixed(1); // Random decimal between 0.1 and 0.8
-          temperature += parseFloat(randomDecimal); // Add the variation to the temperature
+
+          // Remove the small decimal variation
+          // const randomDecimal = (Math.random() * 0.7 + 0.1).toFixed(1); // Random decimal between 0.1 and 0.8
+          // temperature += parseFloat(randomDecimal); // Add the variation to the temperature
 
           setTemperature(temperature); // Set the fetched temperature in Home
           addTemperatureToHistory({ // Add fetched temperature to the history

@@ -37,9 +37,9 @@ function Sidebar() {
       <nav className="nav-links">
         <ul>
           <li><Link to="/home">Home</Link></li> {/* Update Home button */}
-          <li><Link to="/profile">Profile</Link></li>
-          <li><Link to="/history">History</Link></li>
-          <li><button className="logout-button" onClick={handleLogout}>Logout</button></li> {/* Add onClick event to logout button */}
+          <li><a href="/profile">Profile</a></li>
+          <li><a href="/history">History</a></li>
+          <li><button className="logout-button" onClick={handleLogout}>Logout</button></li> {/* Update logout button */}
         </ul>
       </nav>
     </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getFirestore, getDocs, collection, query, where } from 'firebase/firestore';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { signInWithGoogle } from './firebaseConfig'; // Import the signInWithGoogle function
 import './Login.css';
 
@@ -8,34 +9,27 @@ function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-  const db = getFirestore(); // Firestore instance
+  const auth = getAuth();
+  const db = getFirestore();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Login attempt with:', email, password);
 
     try {
-      // Query to check if the email exists in the 'users' collection
-      const userQuery = query(
-        collection(db, 'users'),
-        where('email', '==', email),
-        where('password', '==', password)
-      );
-
-      const querySnapshot = await getDocs(userQuery);
-
-      if (!querySnapshot.empty) {
-        // If the query returns a document, the credentials are valid
-        const userData = querySnapshot.docs[0].data(); // Get user data
-        sessionStorage.setItem('user', JSON.stringify(userData)); // Store user data in sessionStorage
-        navigate('/home'); // Redirect to the home page
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (userDoc.exists()) {
+        sessionStorage.setItem('user', JSON.stringify(userDoc.data())); // Store user data in sessionStorage
+        navigate('/home');
       } else {
-        // If no document is found, credentials are invalid
-        console.error('Invalid email or password');
-        alert('Invalid email or password'); // Display an error message
+        alert('User not found.');
+        auth.signOut();
       }
-    } catch (error) {
-      console.error('Error logging in:', error);
+    } catch (e) {
+      console.error('Error logging in: ', e);
+      alert('Error logging in.');
     }
   };
 
@@ -47,11 +41,6 @@ function Login() {
     } catch (error) {
       console.error('Google sign-in error:', error);
     }
-  };
-
-  const handleLogout = () => {
-    sessionStorage.removeItem('user'); // Clear sessionStorage on logout
-    navigate('/login');
   };
 
   return (

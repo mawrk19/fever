@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { getFirestore, doc, setDoc } from 'firebase/firestore';
 import './Register.css';
 
@@ -9,22 +10,34 @@ function Register() {
   const [password, setPassword] = useState('');
   const [contactNumber, setContactNumber] = useState('');
   const navigate = useNavigate();
-  const db = getFirestore();
+  const auth = getAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Register attempt with:', name, email, password, contactNumber);
     
     try {
-      await setDoc(doc(db, 'users', 'GwUNL51KsSDyFDwfHcgA'), {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      
+      // Add user to Firestore
+      const db = getFirestore();
+      await setDoc(doc(db, 'users', user.uid), {
+        uid: user.uid, // Add uid to the Firestore document
         name,
         email,
-        password,
-        contactNumber
+        contactNumber,
+        password
       });
+
+      alert('Registration successful.');
       navigate('/login');
     } catch (e) {
-      console.error('Error adding document: ', e);
+      if (e.code === 'auth/email-already-in-use') {
+        alert('The email address is already in use by another account.');
+      } else {
+        console.error('Error adding document: ', e);
+      }
     }
   };
 

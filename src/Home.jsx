@@ -5,10 +5,9 @@ import './Home.css'; // Import Home CSS
 
 function Home() {
   const [temperature, setTemperature] = useState(null);
-  const [history, setHistory] = useState([]); // State to store history data
 
   const addTemperatureToHistory = (newTemperature) => {
-    setHistory((prevHistory) => [...prevHistory, newTemperature]);
+    // Function to add temperature to history
   };
 
   return (
@@ -21,7 +20,6 @@ function Home() {
           addTemperatureToHistory={addTemperatureToHistory} 
         />
       </div>
-      {/* Pass history to History component */}
     </div>
   );
 }

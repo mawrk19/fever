@@ -1,53 +1,59 @@
-import React, { useState, useEffect } from 'react';
-import './History.css';
+import React, { useEffect, useState } from 'react';
+import { firestore } from './firebaseConfig'; // Import firestore from firebaseConfig
+import { collection, getDocs, writeBatch } from 'firebase/firestore'; // Import collection, getDocs, and writeBatch from firebase/firestore
+import './History.css'; // Import the updated CSS
 
 function History() {
-  const [temperatureHistory, setTemperatureHistory] = useState([]);
+  const [history, setHistory] = useState([]);
 
   useEffect(() => {
-    // Retrieve the stored temperature data from sessionStorage
-    const storedTemperature = sessionStorage.getItem('latestTemperature');
-    if (storedTemperature) {
-      setTemperatureHistory(prevHistory => [
-        ...prevHistory,
-        JSON.parse(storedTemperature),
-      ]);
-    }
+    const fetchHistory = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(firestore, 'temperatures'));
+        const historyData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setHistory(historyData);
+      } catch (error) {
+        console.error('Error fetching history:', error);
+      }
+    };
+
+    fetchHistory();
   }, []);
 
-  // Function to handle the deletion of all temperature entries
-  const handleDeleteAll = () => {
-    setTemperatureHistory([]);
-    sessionStorage.removeItem('latestTemperature');
+  const deleteAllHistory = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(firestore, 'temperatures'));
+      const batch = writeBatch(firestore); // Use writeBatch to create a batch
+      querySnapshot.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+      await batch.commit();
+      setHistory([]);
+      console.log('All history deleted successfully.');
+    } catch (error) {
+      console.error('Error deleting history:', error);
+    }
   };
 
   return (
     <div className="table-container">
-      <table>
+      <table className="static-size-table"> {/* Add className for static size */}
         <thead>
           <tr>
-            <th>Temperature (°C)</th>
-            <th>Status</th>
+            <th>Temperature</th>
             <th>Timestamp</th>
-            <th>Action</th>
           </tr>
         </thead>
         <tbody>
-          {temperatureHistory.map((temp, index) => (
+          {history.map((entry, index) => (
             <tr key={index}>
-              <td>{temp.temperature.toFixed(1)} °C</td>
-              <td className={temp.temperature >= 37.6 ? 'fever-status' : 'normal-status'}>
-                {temp.temperature >= 37.6 ? 'Fever' : 'Normal'}
-              </td>
-              <td>{new Date(temp.timestamp).toLocaleString()}</td>
-              <td>
-                {/* Individual delete button removed */}
-              </td>
+              <td>{entry.temperature}</td>
+              <td>{new Date(entry.timestamp).toLocaleString()}</td>
             </tr>
           ))}
         </tbody>
       </table>
-      <button className="delete-all" onClick={handleDeleteAll}>Delete All</button>
+      <button className="delete-all" onClick={deleteAllHistory}>Delete All</button>
     </div>
   );
 }

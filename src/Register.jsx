@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { getFirestore, doc, setDoc } from 'firebase/firestore';
 import './Register.css';
 
@@ -19,23 +19,18 @@ function Register() {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      const actionCodeSettings = {
-        url: `http://localhost:3000/verify-email?oobCode=${user.uid}&name=${name}&email=${email}&contactNumber=${contactNumber}&password=${password}`,
-        handleCodeInApp: true,
-      };
-      await sendEmailVerification(user, actionCodeSettings);
       
-      // Add user to Firestore with status deactivated
+      // Add user to Firestore
       const db = getFirestore();
       await setDoc(doc(db, 'users', user.uid), {
+        uid: user.uid, // Add uid to the Firestore document
         name,
         email,
         contactNumber,
-        password,
-        status: 'deactivated'
+        password
       });
 
-      alert('Verification email sent. Please check your inbox.');
+      alert('Registration successful.');
       navigate('/login');
     } catch (e) {
       if (e.code === 'auth/email-already-in-use') {

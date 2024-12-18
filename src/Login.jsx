@@ -20,11 +20,11 @@ function Login() {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       const userDoc = await getDoc(doc(db, 'users', user.uid));
-      if (userDoc.exists() && userDoc.data().status === 'active') {
+      if (userDoc.exists()) {
         sessionStorage.setItem('user', JSON.stringify(userDoc.data())); // Store user data in sessionStorage
         navigate('/home');
       } else {
-        alert('Account is not activated. Please verify your email.');
+        alert('User not found.');
         auth.signOut();
       }
     } catch (e) {

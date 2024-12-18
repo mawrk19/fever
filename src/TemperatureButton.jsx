@@ -48,7 +48,7 @@ function TemperatureButton({ setTemperature, addTemperatureToHistory }) {
 
           // Save the temperature to Firestore and RTDB
           saveTemperature(temperature);
-          saveTemperatureToFirestore(temperature);
+          saveTemperatureToFirestore(temperature); // Ensure this function is called to save to Firestore
         } else {
           console.error('Invalid temperature data structure:', latestTemperature);
         }

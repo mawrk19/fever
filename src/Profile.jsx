@@ -32,14 +32,18 @@ function Profile() {
     <div className="profile-container">
       <Sidebar /> {/* Add Sidebar component */}
       <div className="main-content">
-        <div className="profile-header">
-          <img src={user.profilePicture || 'https://via.placeholder.com/150'} alt="Profile" className="profile-picture" />
-          <h1 className="profile-name">{user.name || 'Not Available'}</h1>
-        </div>
-        <div className="profile-details">
-          <p><strong>Email:</strong> {user.email || 'Not Available'}</p>
-          <p><strong>Joined:</strong> {new Date(user.joinedDate).toLocaleDateString() || 'Not Available'}</p>
-          <p><strong>Bio:</strong> {user.bio || 'Not Available'}</p>
+        <h1 className="profile-title">My Profile</h1>
+        <div className="profile-card">
+          <img
+            src={user.imageUrl || 'https://via.placeholder.com/150'}
+            alt="Profile"
+            className="profile-image"
+          />
+          <div className="profile-details">
+            <p><strong>Name:</strong> {user.name || 'Not Available'}</p>
+            <p><strong>Email:</strong> {user.email || 'Not Available'}</p>
+            <p><strong>Contact Number:</strong> {user.contactNumber || 'Not Available'}</p>
+          </div>
         </div>
       </div>
     </div>

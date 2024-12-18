@@ -1,22 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { database } from './firebaseConfig'; // Import database from firebaseConfig
-import { ref, onValue, set } from 'firebase/database'; // Import ref, onValue, and set from firebase/database
+import { ref, get, set } from 'firebase/database'; // Import ref, get, and set from firebase/database
 import { firestore } from './firebaseConfig'; // Import firestore from firebaseConfig
 import { collection, addDoc } from 'firebase/firestore'; // Import collection and addDoc from firebase/firestore
 
 function TemperatureButton({ setTemperature, addTemperatureToHistory }) {
   const [isLoading, setIsLoading] = useState(false); // State to track if the request is ongoing
-  const [currentTemperature, setCurrentTemperature] = useState(null); // Store the fetched temperature
-  const [lastUpdateTime, setLastUpdateTime] = useState(0); // Track last update time to throttle updates
 
-  // Set the interval for sending updates to Firebase (e.g., every 10 seconds)
-  const updateInterval = 10000; // 10 seconds
-
-  // Function to listen for changes to the temperature in the RTDB
-  useEffect(() => {
-    const tempRef = ref(database, 'temperatures');
+  // Function to fetch the latest temperature data from RTDB
+  const getCurrentTemperature = async () => {
+    if (isLoading) return; // Prevent multiple clicks if already loading
     
-    const unsubscribe = onValue(tempRef, (snapshot) => {
+    setIsLoading(true); // Set loading state to true
+    
+    try {
+      const tempRef = ref(database, 'temperatures');
+      const snapshot = await get(tempRef);
       if (snapshot.exists()) {
         const temperatures = snapshot.val();
         console.log('Fetched Temperatures:', temperatures);
@@ -28,16 +27,15 @@ function TemperatureButton({ setTemperature, addTemperatureToHistory }) {
         console.log('Latest Temperature Data:', latestTemperature);
 
         if (latestTemperature?.temperature && latestTemperature?.timestamp) {
+          // Ensure the fetched temperature is treated as a float
           let temperature = parseFloat(latestTemperature.temperature);
-
+          
           // Add a small decimal variation between 0.1 and 0.8
           const randomDecimal = (Math.random() * 0.7 + 0.1).toFixed(1); // Random decimal between 0.1 and 0.8
           temperature += parseFloat(randomDecimal); // Add the variation to the temperature
 
-          setCurrentTemperature(temperature); // Update the current temperature
-
-          // Add the temperature to history (without clearing)
-          addTemperatureToHistory({
+          setTemperature(temperature); // Set the fetched temperature in Home
+          addTemperatureToHistory({ // Add fetched temperature to the history
             temperature: temperature,
             timestamp: Date.now(),
           });
@@ -48,27 +46,21 @@ function TemperatureButton({ setTemperature, addTemperatureToHistory }) {
             timestamp: Date.now(),
           }));
 
-          // Check if enough time has passed since the last update before saving the new data
-          if (Date.now() - lastUpdateTime >= updateInterval) {
-            setLastUpdateTime(Date.now()); // Update last update time
-
-            // Save the temperature to Firestore and RTDB
-            saveTemperature(temperature);
-            saveTemperatureToFirestore(temperature);
-          }
+          // Save the temperature to Firestore and RTDB
+          saveTemperature(temperature);
+          saveTemperatureToFirestore(temperature);
         } else {
           console.error('Invalid temperature data structure:', latestTemperature);
         }
       } else {
         console.log('No temperature data available.');
       }
-    });
-
-    // Cleanup the listener on unmount
-    return () => {
-      unsubscribe();
-    };
-  }, [lastUpdateTime, addTemperatureToHistory]); // Added addTemperatureToHistory to dependency array
+    } catch (error) {
+      console.error('Error getting temperature:', error);
+    } finally {
+      setIsLoading(false); // Set loading state back to false after the request completes
+    }
+  };
 
   // Function to save new temperature data to RTDB
   const saveTemperature = async (temperature) => {
@@ -98,12 +90,9 @@ function TemperatureButton({ setTemperature, addTemperatureToHistory }) {
   };
 
   return (
-    <div>
-      <p>Current Temperature: {currentTemperature !== null ? currentTemperature.toFixed(1) : 'Loading...'}</p>
-      <button onClick={() => setIsLoading(true)} disabled={isLoading}>
-        {isLoading ? 'Fetching Temperature...' : 'Get and Save Current Temperature'}
-      </button>
-    </div>
+    <button onClick={getCurrentTemperature} disabled={isLoading}>
+      {isLoading ? 'Fetching Temperature...' : 'Get and Save Current Temperature'}
+    </button>
   );
 }
 

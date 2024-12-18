@@ -86,6 +86,9 @@ function Login() {
         <button className="register-btn" onClick={() => navigate('/register')}>
           Register
         </button>
+        <button className="logout-btn" onClick={handleLogout}>
+          Logout
+        </button>
       </div>
     </div>
   );

@@ -23,7 +23,7 @@ function App() {
             <Route path="/profile" element={<Profile />} /> {/* Add Profile route */}
             <Route path="/history" element={<History />} /> {/* Add History route */}
             <Route path="/verify-email" element={<VerifyEmail />} /> {/* Add VerifyEmail route */}
-            {/* Remove redirection to login for email verification */}
+            <Route path="/" element={<Login />} /> {/* Default route */}
           </Routes>
         </div>
       </div>

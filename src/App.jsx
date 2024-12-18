@@ -7,6 +7,7 @@ import Home from './Home'; // Import the Home component
 import Profile from './Profile'; // Import the Profile component
 import History from './History'; // Import the History component
 import Sidebar from './Sidebar'; // Import the Sidebar component
+import VerifyEmail from './VerifyEmail'; // Import the VerifyEmail component
 
 function App() {
   return (
@@ -21,7 +22,8 @@ function App() {
             <Route path="/home" element={<Home />} /> {/* Add Home route */}
             <Route path="/profile" element={<Profile />} /> {/* Add Profile route */}
             <Route path="/history" element={<History />} /> {/* Add History route */}
-            <Route path="/" element={<Login />} /> {/* Default route */}
+            <Route path="/verify-email" element={<VerifyEmail />} /> {/* Add VerifyEmail route */}
+            {/* Remove redirection to login for email verification */}
           </Routes>
         </div>
       </div>

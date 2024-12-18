@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getFirestore, doc, setDoc } from 'firebase/firestore';
 import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import { getFirestore, doc, setDoc } from 'firebase/firestore';
 import './Register.css';
 
 function Register() {
@@ -10,7 +10,6 @@ function Register() {
   const [password, setPassword] = useState('');
   const [contactNumber, setContactNumber] = useState('');
   const navigate = useNavigate();
-  const db = getFirestore();
   const auth = getAuth();
 
   const handleSubmit = async (e) => {
@@ -20,16 +19,30 @@ function Register() {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      await sendEmailVerification(user);
+      const actionCodeSettings = {
+        url: `http://localhost:3000/verify-email?oobCode=${user.uid}&name=${name}&email=${email}&contactNumber=${contactNumber}&password=${password}`,
+        handleCodeInApp: true,
+      };
+      await sendEmailVerification(user, actionCodeSettings);
+      
+      // Add user to Firestore with status deactivated
+      const db = getFirestore();
       await setDoc(doc(db, 'users', user.uid), {
         name,
         email,
-        contactNumber
+        contactNumber,
+        password,
+        status: 'deactivated'
       });
+
       alert('Verification email sent. Please check your inbox.');
       navigate('/login');
     } catch (e) {
-      console.error('Error adding document: ', e);
+      if (e.code === 'auth/email-already-in-use') {
+        alert('The email address is already in use by another account.');
+      } else {
+        console.error('Error adding document: ', e);
+      }
     }
   };
 

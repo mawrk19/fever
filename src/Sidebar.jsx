@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom'; // Import Link from react-router-dom
+import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
 import './Sidebar.css'; // Import Sidebar CSS
 
 function Sidebar() {
@@ -20,6 +20,13 @@ function Sidebar() {
     }
   }
 
+  const navigate = useNavigate(); // Initialize useNavigate
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('user'); // Remove user data from session storage
+    navigate('/login'); // Redirect to login page
+  };
+
   return (
     <div className="sidebar">
       <div className="user-info">
@@ -30,9 +37,9 @@ function Sidebar() {
       <nav className="nav-links">
         <ul>
           <li><Link to="/home">Home</Link></li> {/* Update Home button */}
-          <li><a href="/profile">Profile</a></li>
-          <li><a href="/history">History</a></li>
-          <li><button className="logout-button">Logout</button></li>
+          <li><Link to="/profile">Profile</Link></li>
+          <li><Link to="/history">History</Link></li>
+          <li><button className="logout-button" onClick={handleLogout}>Logout</button></li> {/* Add onClick event to logout button */}
         </ul>
       </nav>
     </div>

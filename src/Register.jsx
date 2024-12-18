@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getFirestore, doc, setDoc } from 'firebase/firestore';
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import './Register.css';
 
 function Register() {
@@ -10,18 +11,22 @@ function Register() {
   const [contactNumber, setContactNumber] = useState('');
   const navigate = useNavigate();
   const db = getFirestore();
+  const auth = getAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log('Register attempt with:', name, email, password, contactNumber);
     
     try {
-      await setDoc(doc(db, 'users', 'GwUNL51KsSDyFDwfHcgA'), {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      await sendEmailVerification(user);
+      await setDoc(doc(db, 'users', user.uid), {
         name,
         email,
-        password,
         contactNumber
       });
+      alert('Verification email sent. Please check your inbox.');
       navigate('/login');
     } catch (e) {
       console.error('Error adding document: ', e);

@@ -15,19 +15,10 @@ function History() {
     }
   }, []);
 
-  // Function to handle the deletion of a temperature entry
-  const handleDelete = (timestamp) => {
-    // Remove from state
-    setTemperatureHistory(prevHistory => prevHistory.filter(temp => temp.timestamp !== timestamp));
-
-    // Optionally, remove from sessionStorage if you're only using it for this session
-    const storedTemperature = sessionStorage.getItem('latestTemperature');
-    if (storedTemperature) {
-      const parsedTemp = JSON.parse(storedTemperature);
-      if (parsedTemp.timestamp === timestamp) {
-        sessionStorage.removeItem('latestTemperature');
-      }
-    }
+  // Function to handle the deletion of all temperature entries
+  const handleDeleteAll = () => {
+    setTemperatureHistory([]);
+    sessionStorage.removeItem('latestTemperature');
   };
 
   return (
@@ -38,7 +29,7 @@ function History() {
             <th>Temperature (°C)</th>
             <th>Status</th>
             <th>Timestamp</th>
-            <th>Action</th> {/* Add a column for the delete button */}
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -50,12 +41,13 @@ function History() {
               </td>
               <td>{new Date(temp.timestamp).toLocaleString()}</td>
               <td>
-                <button onClick={() => handleDelete(temp.timestamp)}>Delete</button> {/* Delete button */}
+                {/* Individual delete button removed */}
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      <button className="delete-all" onClick={handleDeleteAll}>Delete All</button>
     </div>
   );
 }
